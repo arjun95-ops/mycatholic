@@ -1,7 +1,11 @@
 // Auth Service
 
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase/client';
+import {
+  isSupabaseConfigured,
+  supabase,
+  supabaseConfigError,
+} from '@/lib/supabase/client';
 import type { Profile, User } from '@/lib/types';
 
 type ProfileUpsertPayload = Record<string, unknown>;
@@ -143,9 +147,20 @@ function normalizeSupabaseError(error: unknown): string {
   return [code, message, details].filter(Boolean).join(' | ') || 'Unknown error';
 }
 
+function requireSupabaseConfiguration() {
+  if (!isSupabaseConfigured) {
+    throw new Error(
+      supabaseConfigError ??
+        'Supabase belum dikonfigurasi. Isi NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY.'
+    );
+  }
+}
+
 export class AuthService {
   // Sign in with email and password
   static async signIn(email: string, password: string) {
+    requireSupabaseConfiguration();
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -160,6 +175,8 @@ export class AuthService {
 
   // Sign up new user and sync profile row for mobile/admin compatibility
   static async signUp(payload: RegisterPayload) {
+    requireSupabaseConfiguration();
+
     if (!payload.agreeTerms) {
       throw new Error('Anda harus menyetujui syarat dan ketentuan.');
     }
@@ -262,6 +279,8 @@ export class AuthService {
 
   // Sign out
   static async signOut() {
+    requireSupabaseConfiguration();
+
     const { error } = await supabase.auth.signOut();
 
     if (error) {
@@ -271,6 +290,10 @@ export class AuthService {
 
   // Get current user
   static async getCurrentUser(): Promise<User | null> {
+    if (!isSupabaseConfigured) {
+      return null;
+    }
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -279,6 +302,10 @@ export class AuthService {
 
   // Get current session
   static async getCurrentSession() {
+    if (!isSupabaseConfigured) {
+      return null;
+    }
+
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -491,6 +518,8 @@ export class AuthService {
 
   // Reset password (send email)
   static async resetPassword(email: string) {
+    requireSupabaseConfiguration();
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
@@ -502,6 +531,8 @@ export class AuthService {
 
   // Update password
   static async updatePassword(password: string) {
+    requireSupabaseConfiguration();
+
     const { error } = await supabase.auth.updateUser({
       password,
     });

@@ -2,19 +2,25 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'public-anon-key-placeholder';
+const envSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? '';
+const envSupabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? '';
+
+const supabaseUrl = envSupabaseUrl || 'https://placeholder.supabase.co';
+const supabaseAnonKey = envSupabaseAnonKey || 'public-anon-key-placeholder';
 console.log('Supabase Config:', {
-  url: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Loaded' : 'Missing',
-  key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Loaded' : 'Missing'
+  url: envSupabaseUrl ? 'Loaded' : 'Missing',
+  key: envSupabaseAnonKey ? 'Loaded' : 'Missing',
 });
 
-export const isSupabaseConfigured = Boolean(
-  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+export const isSupabaseConfigured = Boolean(envSupabaseUrl && envSupabaseAnonKey);
+export const supabaseConfigError = isSupabaseConfigured
+  ? null
+  : 'Supabase belum dikonfigurasi. Isi NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY di environment.';
 
 if (!isSupabaseConfigured) {
-  console.warn('Supabase URL or Anon Key is missing. Please check your environment variables.');
+  console.warn(
+    'Supabase URL or Anon Key is missing. Please check your environment variables.'
+  );
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
