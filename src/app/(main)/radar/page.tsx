@@ -15,6 +15,7 @@ import {
   Plus,
   Search,
   Users,
+  Compass,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -233,10 +234,10 @@ async function insertWithColumnFallback(
   for (let attempt = 0; attempt < 8; attempt += 1) {
     const result = options?.select
       ? await supabase
-          .from(table)
-          .insert(working)
-          .select(options.select)
-          .maybeSingle()
+        .from(table)
+        .insert(working)
+        .select(options.select)
+        .maybeSingle()
       : await supabase.from(table).insert(working);
 
     if (!result.error) {
@@ -338,10 +339,10 @@ async function getRadarEvents(userId?: string) {
   const legacy =
     legacyWithVisibility.error && isMissingColumnError(legacyWithVisibility.error.message)
       ? await supabase
-          .from('radar_events')
-          .select('id, title, description, event_time, max_participants, church_id, creator_id, allow_member_invite, status')
-          .order('event_time', { ascending: true })
-          .limit(50)
+        .from('radar_events')
+        .select('id, title, description, event_time, max_participants, church_id, creator_id, allow_member_invite, status')
+        .order('event_time', { ascending: true })
+        .limit(50)
       : legacyWithVisibility;
 
   const v2WithVisibility = await supabase
@@ -352,10 +353,10 @@ async function getRadarEvents(userId?: string) {
   const v2 =
     v2WithVisibility.error && isMissingColumnError(v2WithVisibility.error.message)
       ? await supabase
-          .from('radar_events_v2')
-          .select('id, title, description, event_starts_at_utc, max_participants, church_id, creator_id, allow_member_invite, status')
-          .order('event_starts_at_utc', { ascending: true })
-          .limit(50)
+        .from('radar_events_v2')
+        .select('id, title, description, event_starts_at_utc, max_participants, church_id, creator_id, allow_member_invite, status')
+        .order('event_starts_at_utc', { ascending: true })
+        .limit(50)
       : v2WithVisibility;
 
   if (legacy.error && v2.error) {
@@ -462,11 +463,11 @@ async function getOwnerRadarEvents(userId?: string) {
   const legacy =
     legacyWithVisibility.error && isMissingColumnError(legacyWithVisibility.error.message)
       ? await supabase
-          .from('radar_events')
-          .select('id, title, description, event_time, max_participants, church_id, creator_id, allow_member_invite, status')
-          .eq('creator_id', userId)
-          .order('event_time', { ascending: false })
-          .limit(300)
+        .from('radar_events')
+        .select('id, title, description, event_time, max_participants, church_id, creator_id, allow_member_invite, status')
+        .eq('creator_id', userId)
+        .order('event_time', { ascending: false })
+        .limit(300)
       : legacyWithVisibility;
 
   const v2WithVisibility = await supabase
@@ -478,11 +479,11 @@ async function getOwnerRadarEvents(userId?: string) {
   const v2 =
     v2WithVisibility.error && isMissingColumnError(v2WithVisibility.error.message)
       ? await supabase
-          .from('radar_events_v2')
-          .select('id, title, description, event_starts_at_utc, max_participants, church_id, creator_id, allow_member_invite, status')
-          .eq('creator_id', userId)
-          .order('event_starts_at_utc', { ascending: false })
-          .limit(300)
+        .from('radar_events_v2')
+        .select('id, title, description, event_starts_at_utc, max_participants, church_id, creator_id, allow_member_invite, status')
+        .eq('creator_id', userId)
+        .order('event_starts_at_utc', { ascending: false })
+        .limit(300)
       : v2WithVisibility;
 
   if (legacy.error && v2.error) {
@@ -587,10 +588,10 @@ async function getRadarEventById(radarId?: string): Promise<RadarCardItem | null
   const legacy =
     legacyWithChurch.error && isMissingColumnError(legacyWithChurch.error.message)
       ? await supabase
-          .from('radar_events')
-          .select('id, title, description, event_time, max_participants, church_id, creator_id, allow_member_invite, status')
-          .eq('id', id)
-          .maybeSingle()
+        .from('radar_events')
+        .select('id, title, description, event_time, max_participants, church_id, creator_id, allow_member_invite, status')
+        .eq('id', id)
+        .maybeSingle()
       : legacyWithChurch;
 
   const v2WithChurch = await supabase
@@ -601,10 +602,10 @@ async function getRadarEventById(radarId?: string): Promise<RadarCardItem | null
   const v2 =
     v2WithChurch.error && isMissingColumnError(v2WithChurch.error.message)
       ? await supabase
-          .from('radar_events_v2')
-          .select('id, title, description, event_starts_at_utc, max_participants, church_id, creator_id, allow_member_invite, status')
-          .eq('id', id)
-          .maybeSingle()
+        .from('radar_events_v2')
+        .select('id, title, description, event_starts_at_utc, max_participants, church_id, creator_id, allow_member_invite, status')
+        .eq('id', id)
+        .maybeSingle()
       : v2WithChurch;
 
   let row: Record<string, unknown> | null = null;
@@ -859,8 +860,8 @@ async function createRadarEvent(params: {
 
   throw new Error(
     legacyCreated.error?.message ||
-      v2Insert.error?.message ||
-      'Gagal membuat radar'
+    v2Insert.error?.message ||
+    'Gagal membuat radar'
   );
 }
 
@@ -1055,8 +1056,8 @@ async function createPersonalRadarInvite(params: {
 
   throw new Error(
     legacyCreated.error?.message ||
-      v2Created.error?.message ||
-      'Gagal membuat ajak misa personal.'
+    v2Created.error?.message ||
+    'Gagal membuat ajak misa personal.'
   );
 }
 
@@ -1278,8 +1279,8 @@ async function setCheckInNow(params: {
 
   throw new Error(
     legacyInsert.error?.message ||
-      v2Insert.error?.message ||
-      'Gagal check-in sekarang'
+    v2Insert.error?.message ||
+    'Gagal check-in sekarang'
   );
 }
 
@@ -1760,9 +1761,9 @@ async function getRadarMap(radarIds: string[]) {
   const legacy =
     legacyWithVisibility.error && isMissingColumnError(legacyWithVisibility.error.message)
       ? await supabase
-          .from('radar_events')
-          .select('id, title, event_time')
-          .in('id', ids)
+        .from('radar_events')
+        .select('id, title, event_time')
+        .in('id', ids)
       : legacyWithVisibility;
   if (!legacy.error) {
     for (const row of (legacy.data ?? []) as Record<string, unknown>[]) {
@@ -1785,9 +1786,9 @@ async function getRadarMap(radarIds: string[]) {
   const v2 =
     v2WithVisibility.error && isMissingColumnError(v2WithVisibility.error.message)
       ? await supabase
-          .from('radar_events_v2')
-          .select('id, title, event_starts_at_utc')
-          .in('id', ids)
+        .from('radar_events_v2')
+        .select('id, title, event_starts_at_utc')
+        .in('id', ids)
       : v2WithVisibility;
   if (!v2.error) {
     for (const row of (v2.data ?? []) as Record<string, unknown>[]) {

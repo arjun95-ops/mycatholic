@@ -86,7 +86,7 @@ export class ScheduleService {
   static async getChurches(limit = 200): Promise<Church[]> {
     const { data, error } = await supabase
       .from('churches')
-      .select('id, diocese_id, name, parish, address, latitude, longitude, phone, website, image_url, created_at')
+      .select('id, diocese_id, name, address, latitude, longitude, image_url, created_at')
       .order('name', { ascending: true })
       .limit(limit);
 
