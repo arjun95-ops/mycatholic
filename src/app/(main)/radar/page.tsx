@@ -9,7 +9,6 @@ import {
   Calendar,
   CheckCircle2,
   Clock3,
-  Compass,
   LogOut,
   Loader2,
   MapPin,
@@ -2203,6 +2202,7 @@ export default function RadarPage() {
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [joiningRadarId, setJoiningRadarId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'cari' | 'riwayat' | 'ajak'>(normalizedRequestedTab);
+  const [isPresenceExpanded, setIsPresenceExpanded] = useState(false);
   const [publicFilter, setPublicFilter] = useState<PublicFilter>('all');
   const [publicSort, setPublicSort] = useState<PublicSort>('soonest');
 
@@ -2356,6 +2356,11 @@ export default function RadarPage() {
     setCheckInDate(toLocalDateValue(new Date()));
     setIsCheckInDialogOpen(true);
   }, [activeCheckIn, churches, defaultCheckInChurchId, openCheckinFromQuery]);
+  useEffect(() => {
+    if (!activeCheckIn) {
+      setIsPresenceExpanded(false);
+    }
+  }, [activeCheckIn]);
   const checkInDayOfWeek = useMemo(() => {
     const date = new Date(`${checkInDate}T00:00:00`);
     if (Number.isNaN(date.getTime())) return new Date().getDay();
@@ -2447,6 +2452,11 @@ export default function RadarPage() {
       null
     );
   }, [inviteRadarOptions, selectedInviteRadarId]);
+  useEffect(() => {
+    if (!radarIdFromQuery) return;
+    if (!inviteRadarOptions.some((item) => item.id === radarIdFromQuery)) return;
+    setSelectedInviteRadarId((current) => (current === radarIdFromQuery ? current : radarIdFromQuery));
+  }, [inviteRadarOptions, radarIdFromQuery]);
   const canInviteOnSelectedRadar = useMemo(() => {
     if (!selectedInviteRadar || !user?.id) return false;
     if (selectedInviteRadar.creatorId === user.id) return true;
@@ -2481,15 +2491,16 @@ export default function RadarPage() {
     enabled: Boolean(user?.id),
     refetchInterval: 60_000,
   });
+  const activePresenceChurchId = activeCheckIn?.churchId || defaultCheckInChurchId;
   const { data: checkInPresence = [], isLoading: isLoadingCheckInPresence } = useQuery({
-    queryKey: ['checkin-presence', defaultCheckInChurchId, user?.id],
+    queryKey: ['checkin-presence', activePresenceChurchId, user?.id],
     queryFn: () =>
       getCheckInPresence({
-        churchId: defaultCheckInChurchId,
+        churchId: activePresenceChurchId,
         currentUserId: user?.id,
         limit: 8,
       }),
-    enabled: Boolean(defaultCheckInChurchId),
+    enabled: Boolean(activeCheckIn && activePresenceChurchId),
     refetchInterval: 60_000,
   });
 
@@ -2521,6 +2532,10 @@ export default function RadarPage() {
   const checkInChurchName = useMemo(
     () => churches.find((church) => church.id === checkInChurchId)?.name || 'Gereja',
     [checkInChurchId, churches]
+  );
+  const activeCheckInChurchName = useMemo(
+    () => churches.find((church) => church.id === activePresenceChurchId)?.name || 'gereja terpilih',
+    [activePresenceChurchId, churches]
   );
   const focusedRadarMembership = focusedRadar?.id ? radarMembershipMap[focusedRadar.id] : undefined;
   const isFocusedRadarJoined = focusedRadarMembership === 'JOINED';
@@ -2720,6 +2735,11 @@ export default function RadarPage() {
     } finally {
       setJoiningRadarId(null);
     }
+  };
+
+  const handleOpenRadarDetail = (radar: RadarCardItem) => {
+    if (!radar.id) return;
+    router.push(`/radar/${encodeURIComponent(radar.id)}`);
   };
 
   const handleOpenFocusedRadarInvite = () => {
@@ -3179,6 +3199,7 @@ export default function RadarPage() {
               pendingRadarSet={pendingRadarSet}
               joiningRadarId={joiningRadarId}
               onJoin={handleJoinRadar}
+              onOpenDetail={handleOpenRadarDetail}
             />
           </div>
         </TabsContent>
@@ -3190,6 +3211,7 @@ export default function RadarPage() {
             pendingRadarSet={pendingRadarSet}
             joiningRadarId={joiningRadarId}
             onJoin={handleJoinRadar}
+            onOpenDetail={handleOpenRadarDetail}
             showJoinAction={false}
           />
         </TabsContent>
@@ -3833,6 +3855,7 @@ function RadarList({
   pendingRadarSet,
   joiningRadarId,
   onJoin,
+  onOpenDetail,
   showJoinAction = true,
 }: {
   radars: RadarCardItem[];
@@ -3841,6 +3864,7 @@ function RadarList({
   pendingRadarSet?: Set<string>;
   joiningRadarId: string | null;
   onJoin: (radar: RadarCardItem) => Promise<void>;
+  onOpenDetail?: (radar: RadarCardItem) => void;
   showJoinAction?: boolean;
 }) {
   if (isLoading) {
@@ -3888,26 +3912,37 @@ function RadarList({
                     <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{radar.description}</p>
                   )}
                 </div>
-                {showJoinAction && (
-                  <Button
-                    variant={isJoined ? 'secondary' : isPending ? 'outline' : 'default'}
-                    disabled={isJoined || isPending || isJoining}
-                    onClick={() => onJoin(radar)}
-                  >
-                    {isJoining ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Bergabung...
-                      </>
-                    ) : isJoined ? (
-                      'Sudah Bergabung'
-                    ) : isPending ? (
-                      'Menunggu Host'
-                    ) : (
-                      'Gabung'
-                    )}
-                  </Button>
-                )}
+                <div className="flex items-center gap-2">
+                  {onOpenDetail && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onOpenDetail(radar)}
+                    >
+                      Detail
+                    </Button>
+                  )}
+                  {showJoinAction && (
+                    <Button
+                      variant={isJoined ? 'secondary' : isPending ? 'outline' : 'default'}
+                      disabled={isJoined || isPending || isJoining}
+                      onClick={() => onJoin(radar)}
+                    >
+                      {isJoining ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Bergabung...
+                        </>
+                      ) : isJoined ? (
+                        'Sudah Bergabung'
+                      ) : isPending ? (
+                        'Menunggu Host'
+                      ) : (
+                        'Gabung'
+                      )}
+                    </Button>
+                  )}
+                </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
