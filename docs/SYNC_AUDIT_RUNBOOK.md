@@ -70,3 +70,18 @@ Jika ada mismatch, capture:
 - route/halaman
 - table/RPC terkait
 - error exact dari browser console/Supabase logs
+
+## 7) Radar parity smoke (wajib sebelum rilis)
+
+```bash
+npm run audit:smoke:radar
+npm run audit:smoke:radar:invite
+```
+
+Expected:
+- `smoke radar flow lulus`.
+- `smoke 2-user Ajak Misa lulus`.
+
+Catatan:
+- `audit:smoke:radar` memverifikasi create/join/comment/like/checkin/check-out flow.
+- `audit:smoke:radar:invite` memverifikasi skenario ajak misa personal antar 2 akun.

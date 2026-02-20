@@ -11,6 +11,8 @@
     "verify:sync": "node scripts/verify-supabase-sync.mjs",
     "audit:smoke": "node scripts/smoke-sync-readonly.mjs",
     "audit:smoke:write": "node scripts/smoke-sync-write.mjs",
+    "audit:smoke:radar": "node scripts/smoke-radar-flow.mjs",
+    "audit:smoke:radar:invite": "node scripts/smoke-radar-invite-two-users.mjs",
     "e2e:provision": "node scripts/provision-e2e-user.mjs",
     "test:priority": "node --import tsx --test src/lib/features/feed/priority-ranking.test.ts",
     "db:push": "prisma db push",

@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   AlertTriangle,
   Calendar,
+  CalendarPlus,
   Church,
   Hourglass,
   Loader2,
@@ -17,7 +18,6 @@ import {
   Settings,
   Share2,
   Star,
-  UserPlus,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useProfile } from '@/lib/features/profile/use-profile';
@@ -233,27 +233,32 @@ export default function ProfilePage({ params }: { params?: { id?: string } }) {
                       />
                       <Button
                         variant="outline"
-                        size="icon"
+                        size="sm"
                         className="rounded-xl border-border/70 transition-transform hover:-translate-y-0.5"
                         disabled={isCreatingChat}
                         onClick={handleStartChat}
-                        aria-label="Chat"
                       >
                         {isCreatingChat ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Membuka...
+                          </>
                         ) : (
-                          <MessageSquare className="h-5 w-5" />
+                          <>
+                            <MessageSquare className="mr-2 h-4 w-4" />
+                            Chat
+                          </>
                         )}
                       </Button>
                       {canInviteToMass && (
                         <Button
                           variant="outline"
-                          size="icon"
+                          size="sm"
                           className="rounded-xl border-border/70 transition-transform hover:-translate-y-0.5"
                           onClick={handleInviteMass}
-                          aria-label="Ajak Misa"
                         >
-                          <UserPlus className="h-5 w-5" />
+                          <CalendarPlus className="mr-2 h-4 w-4" />
+                          Ajak Misa
                         </Button>
                       )}
                       <Button

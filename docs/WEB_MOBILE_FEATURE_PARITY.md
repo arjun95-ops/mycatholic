@@ -72,6 +72,9 @@ Dokumen ini merangkum status parity antara `mychatolic_app` (mobile) dan versi w
 - `Radar events` web: ✅
 - `Radar tabs (Cari/Riwayat/Ajak)` web: ✅ (kirim/inbox/accept/decline, duplicate-guard, RPC-first response + fallback)
 - `Radar create/check-in action` web: ✅ (buat radar + check-in + join radar)
+- `Radar create parity (lokasi hierarki + jadwal + kuota + invite policy + host approval)` web: ✅
+- `Ajak Misa parity (Masuk/Dikirim + invite dari profile user lain)` web: ✅
+- `Radar detail parity (Aturan Acara + komentar thread + like komentar)` web: ✅
 - `Mass schedule` web: ✅
 - `Bible books` web: ✅
 - `Bible chapter/verse reader` web: ✅ (reader bab/ayat + fallback schema lama/baru)
@@ -93,5 +96,5 @@ Dokumen ini merangkum status parity antara `mychatolic_app` (mobile) dan versi w
 - Style reference `Facebook/Instagram`: ✅ (3-column feed desktop, story rail, profile media grid, social card interactions)
 
 ## Remaining High-Priority Enhancements
-- Lengkapi parity lanjutan tab `Ajak Misa` untuk flow invite yang sepenuhnya memakai skema/RPC v2 di semua edge case.
+- Hardening edge-case skema campuran legacy/v2 untuk data lama (environment yang belum sepenuhnya migrasi).
 - Lengkapi parity route turunan mobile yang sangat spesifik (contoh beberapa halaman utilitas lama Flutter) bila memang masih dipakai pada produk final.
